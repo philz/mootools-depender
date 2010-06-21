@@ -54,6 +54,7 @@ def build(request):
     builds a library given required scripts to includes and other arguments
     accepted URL arguments:
 
+    all - if set to "true", returns all the javascript, except as specified by exclude.  require and requireLibs are ignored.
     require - a comma separated list of *files*(components) to require; can also be specified in the php style as "require[]=foo&require[]=bar"
     requireLibs - a comma separated list of *libraries*(packages) to require - these are the names defined in our *congfig.json* in the *libs* section. So, for example, *requireLibs=mootools-core,mootools-more* using the default config would include both the complete inventories of MooTools Core and More. This can also be specified as a comma separated list or the php style (*requireLibs[]=mootools-core&requireLibs[]=mootools-more*).
     exclude - exactly like the *require* value, except it's a list of files to exclude. This is useful if you have already loaded some scripts and now you require another. You can specify the scripts you already have and the one you now need, and the library will return only those you do not have.
@@ -70,6 +71,7 @@ def build(request):
     else:
       return []
 
+  all = get("all")
   require = get_arr("require")
   exclude = get_arr("exclude")
   excludeLibs = get_arr("excludeLibs")
@@ -92,6 +94,10 @@ def build(request):
 
   if client == "true" and "Depender.Client" not in require:
     require.append("Depender.Client")
+
+  if all == "true":
+    require = []
+    requireLibs = depender.packages.keys()
 
   required = massage(depender, require, requireLibs)
   excluded = massage(depender, exclude, excludeLibs)
